@@ -1,66 +1,47 @@
-# ============================================
-# Streamlit Frontend - Fire Weather Index Prediction
-# ============================================
+from flask import Flask, render_template, request
+import pickle
+import numpy as np
 
-import streamlit as st
-import requests
+# Initialize Flask app
+app = Flask(__name__)
 
-# FastAPI backend URL
-API_URL = "http://127.0.0.1:8000/api/predict"
+# Load model and scaler
+ridge_model = pickle.load(open("ridge.pkl", "rb"))
+scaler = pickle.load(open("scaler.pkl", "rb"))
 
-st.set_page_config(page_title="FWI Prediction", page_icon="🔥", layout="centered")
+# Route for homepage
+@app.route('/')
+def index():
+    return render_template('index.html')
 
-st.title("🔥 Fire Weather Index (FWI) Prediction")
-st.markdown("Enter the meteorological parameters below to get the predicted FWI value.")
+# Route for prediction
+@app.route('/predict', methods=['POST'])
+def predict():
+    try:
+        # Collect input values from form in exact same order as training
+        Temperature = float(request.form['Temperature'])
+        RH = float(request.form['RH'])
+        Ws = float(request.form['Ws'])
+        Rain = float(request.form['Rain'])
+        FFMC = float(request.form['FFMC'])
+        DMC = float(request.form['DMC'])
+        DC = float(request.form['DC'])
+        ISI = float(request.form['ISI'])
+        BUI = float(request.form['BUI'])
 
-# Input form
-col1, col2 = st.columns(2)
+        # Prepare array in same feature order used for training
+        input_data = np.array([[Temperature, RH, Ws, Rain, FFMC, DMC, DC, ISI, BUI]])
 
-with col1:
-    day = st.number_input("Day", min_value=1, max_value=31, value=15)
-    month = st.number_input("Month", min_value=1, max_value=12, value=7)
-    year = st.number_input("Year", min_value=1900, max_value=2100, value=2012)
-    Temperature = st.number_input("Temperature (°C)", value=30.0)
-    RH = st.number_input("Relative Humidity (%)", value=40.0)
-    Ws = st.number_input("Wind Speed (km/h)", value=6.0)
+        # Scale inputs
+        scaled_data = scaler.transform(input_data)
 
-with col2:
-    Rain = st.number_input("Rain (mm)", value=0.0)
-    FFMC = st.number_input("FFMC", value=85.0)
-    DMC = st.number_input("DMC", value=25.0)
-    DC = st.number_input("DC", value=60.0)
-    ISI = st.number_input("ISI", value=5.0)
-    BUI = st.number_input("BUI", value=30.0)
+        # Predict using Ridge model
+        prediction = ridge_model.predict(scaled_data)[0]
 
-# Predict button
-if st.button("🔮 Predict FWI"):
-    data = {
-        "day": day,
-        "month": month,
-        "year": year,
-        "Temperature": Temperature,
-        "RH": RH,
-        "Ws": Ws,
-        "Rain": Rain,
-        "FFMC": FFMC,
-        "DMC": DMC,
-        "DC": DC,
-        "ISI": ISI,
-        "BUI": BUI
-    }
+        return render_template('home.html', prediction_text=f"Predicted FWI Value: {prediction:.2f}")
 
-    with st.spinner("Getting prediction from FastAPI..."):
-        try:
-            response = requests.post(API_URL, json=data)
-            if response.status_code == 200:
-                result = response.json()
-                if "predicted_FWI" in result:
-                    st.success(f"🔥 Predicted Fire Weather Index (FWI): {result['predicted_FWI']}")
-                else:
-                    st.error(f"❌ Error: {result.get('error', 'Unknown issue')}")
-            else:
-                st.error(f"❌ API error: {response.status_code} - {response.text}")
-        except Exception as e:
-            st.error(f"⚠️ Could not connect to FastAPI: {e}")
+    except Exception as e:
+        return render_template('home.html', prediction_text=f"Error: {str(e)}")
 
-st.caption("Built with FastAPI (backend) + Streamlit (frontend)")
+if __name__ == "__main__":
+    app.run(debug=True)
