@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fire Weather Index (FWI) Prediction</title>
+    <style>
+        body {
+            background: linear-gradient(to right, #e3f2fd, #bbdefb);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            padding: 30px;
+        }
+        h1 {
+            color: #0d47a1;
+            margin-bottom: 25px;
+        }
+        form {
+            display: inline-block;
+            background-color: #ffffff;
+            padding: 30px 40px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            text-align: left;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: inline-block;
+            width: 260px;
+            font-weight: bold;
+            color: #1565c0;
+        }
+        input {
+            padding: 8px 12px;
+            width: 180px;
+            border: 1px solid #90caf9;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        input:focus {
+            border-color: #1e88e5;
+            outline: none;
+            box-shadow: 0 0 4px rgba(30,136,229,0.5);
+        }
+        button {
+            background-color: #1e88e5;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            display: block;
+            margin: 25px auto 0;
+        }
+        button:hover {
+            background-color: #1565c0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔥 Fire Weather Index (FWI) Prediction 🔥</h1>
+
+    <form action="/predict" method="post">
+        <div class="form-group">
+            <label>🌡️ Temperature (°C):</label>
+            <input type="number" step="any" name="Temperature" placeholder="e.g., 23.5" required>
+        </div>
+
+        <div class="form-group">
+            <label>💧 Relative Humidity (%):</label>
+            <input type="number" step="any" name="RH" placeholder="e.g., 45" required>
+        </div>
+
+        <div class="form-group">
+            <label>🌬️ Wind Speed (km/h):</label>
+            <input type="number" step="any" name="Ws" placeholder="e.g., 12" required>
+        </div>
+
+        <div class="form-group">
+            <label>🌧️ Rain (mm):</label>
+            <input type="number" step="any" name="Rain" placeholder="e.g., 0.2" required>
+        </div>
+
+        <div class="form-group">
+            <label>🔥 Fine Fuel Moisture Code (FFMC):</label>
+            <input type="number" step="any" name="FFMC" placeholder="e.g., 85.4" required>
+        </div>
+
+        <div class="form-group">
+            <label>🌿 Duff Moisture Code (DMC):</label>
+            <input type="number" step="any" name="DMC" placeholder="e.g., 50.3" required>
+        </div>
+
+        <div class="form-group">
+            <label>☀️ Drought Code (DC):</label>
+            <input type="number" step="any" name="DC" placeholder="e.g., 120.6" required>
+        </div>
+
+        <div class="form-group">
+            <label>🔥 Initial Spread Index (ISI):</label>
+            <input type="number" step="any" name="ISI" placeholder="e.g., 6.2" required>
+        </div>
+
+        <div class="form-group">
+            <label>🌲 Buildup Index (BUI):</label>
+            <input type="number" step="any" name="BUI" placeholder="e.g., 40.7" required>
+        </div>
+
+        <button type="submit">Predict FWI</button>
+    </form>
+</body>
+</html>
